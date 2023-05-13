@@ -82,7 +82,48 @@ robot_td("https://raw.githubusercontent.com/Interactions-HSG/example-tds/main/td
 */
 @select_reading_task_0_plan
 +!select_reading(TempReadings, Celcius) : true <-
+	.findall(Agent,interaction_trust(_,Agent,_,_),Agents);
+	!iterate(Agents);
+	/*
+	for (.member(Agent0, Agents)) {
+		.print("Agent0: ", Agent0);
+    };
+	*/
     .nth(0, TempReadings, Celcius).
+
+/*
++!iterate([Agent0 | Agents]): true <-
+	.print("Agent 0: ", Agent0);
+	!iterate(Agents).
+
++!iterate([]).
+*/
+
+
++!iterate(Agents) : Agents \== [] <-
+	.nth(0, Agents, Agent0);
+	.print("Agent 0: ", Agent0);
+	.findall(T, interaction_trust(_,Agent0,_,T), LT);
+	.length(LT, LengthOfList);
+	?add_up(LT, 0,SumOfList);
+	.print("Sum ", SumOfList);
+	.delete(Agent0, Agents, NewAgents);
+	!iterate(NewAgents).
+
++!iterate(Agents) : true <-
+	.print("done").
+
++?add_up([Head | Tail], Agg, Sum): true <-
+	NewAgg = Head + Agg;
+	?add_up(Tail, NewAgg, NewAgg).
+
++?add_up([], Agg, Sum) : true <-
+	.print("Result of Aggregation: ", Sum).
+
+
+
+
+
 
 /* 
  * Plan for reacting to the addition of the goal !manifest_temperature
