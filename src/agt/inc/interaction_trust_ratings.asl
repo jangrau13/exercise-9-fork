@@ -1,4 +1,3 @@
-/* Initial beliefs and rules */
 interaction_trust(acting_agent, sensing_agent_1,  temperature(12.9), 1).
 interaction_trust(acting_agent, sensing_agent_2,  temperature(12.9), 1).
 interaction_trust(acting_agent, sensing_agent_3,  temperature(12.9), 1).

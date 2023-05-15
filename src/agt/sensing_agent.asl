@@ -22,6 +22,7 @@ i_have_plans_for(R) :- not (role_goal(R,G) & not has_plan_for(G)).
 */
 @start_plan
 +!start : true <-
+	//
 	.print("Hello world").
 
 /* 
@@ -33,6 +34,16 @@ i_have_plans_for(R) :- not (role_goal(R,G) & not has_plan_for(G)).
 @read_temperature_plan
 +!read_temperature : true <-
 	.print("Reading the temperature");
+	.my_name(N);
+	.broadcast(tell, witness_reputation(N, sensing_agent_1, "Trust Me", 1));
+	.broadcast(tell, witness_reputation(N, sensing_agent_2, "Trust Me", 1));
+	.broadcast(tell, witness_reputation(N, sensing_agent_3, "Trust Me", 1));
+	.broadcast(tell, witness_reputation(N, sensing_agent_4, "Trust Me", 1));
+	.broadcast(tell, witness_reputation(N, sensing_agent_5, "Don't trust them", -1));
+	.broadcast(tell, witness_reputation(N, sensing_agent_6, "Don't trust them", -1));
+	.broadcast(tell, witness_reputation(N, sensing_agent_7, "Don't trust them", -1));
+	.broadcast(tell, witness_reputation(N, sensing_agent_8, "Don't trust them", -1));
+	.broadcast(tell, witness_reputation(N, sensing_agent_9, "Don't trust them", -1));
 	readCurrentTemperature(47.42, 9.37, Celcius); // reads the current temperature using the artifact
 	.print("Read temperature (Celcius): ", Celcius);
 	.broadcast(tell, temperature(Celcius)). // broadcasts the temperature reading

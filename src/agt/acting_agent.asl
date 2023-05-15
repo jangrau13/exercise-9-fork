@@ -1,6 +1,7 @@
 // acting agent
 
 /* Initial beliefs and rules */
+degrees(Celcius) :- temperature(Celcius)[source(Agent)] & p(Value,Agent).
 
 // The agent has a belief about the location of the W3C Web of Thing (WoT) Thing Description (TD)
 // that describes a Thing of type https://ci.mines-stetienne.fr/kg/ontology#PhantomX
@@ -8,6 +9,7 @@ robot_td("https://raw.githubusercontent.com/Interactions-HSG/example-tds/main/td
 
 /* Initial goals */
 !start. // the agent has the goal to start
+
 
 /* 
  * Plan for reacting to the addition of the goal !start
@@ -17,6 +19,7 @@ robot_td("https://raw.githubusercontent.com/Interactions-HSG/example-tds/main/td
 */
 @start_plan
 +!start : true <-
+	.broadcast(askOne,certified_reputation(CertificationAgent, SourceAgent, MessageContent, CRRating) );
 	.print("Hello world").
 
 /* 
@@ -84,12 +87,12 @@ robot_td("https://raw.githubusercontent.com/Interactions-HSG/example-tds/main/td
 +!select_reading(TempReadings, Celcius) : true <-
 	.findall(Agent,interaction_trust(_,Agent,_,_),Agents);
 	!iterate(Agents);
-	/*
-	for (.member(Agent0, Agents)) {
-		.print("Agent0: ", Agent0);
-    };
-	*/
-    .nth(0, TempReadings, Celcius).
+	.findall(p(Value,Agent),trust_level(Value,Agent),Result);
+	.max(Result,Max);
+	.print("Max: ", Max);
+	+Max;
+	?degrees(Celcius);
+	.print("Trustee: ",Celcius).
 
 /*
 +!iterate([Agent0 | Agents]): true <-
@@ -99,14 +102,19 @@ robot_td("https://raw.githubusercontent.com/Interactions-HSG/example-tds/main/td
 +!iterate([]).
 */
 
-
 +!iterate(Agents) : Agents \== [] <-
 	.nth(0, Agents, Agent0);
-	.print("Agent 0: ", Agent0);
 	.findall(T, interaction_trust(_,Agent0,_,T), LT);
+	.findall(W, witness_reputation(_,Agent0,_,W), LW);
+	.print("LW: ", LW);
 	.length(LT, LengthOfList);
+	.length(LW, WitnessLengthOfList);
+	?add_up(LW,0, WitnessSumOfList);
 	?add_up(LT, 0,SumOfList);
-	.print("Sum ", SumOfList);
+	?certified_reputation(certification_agent,Agent0,_,CertifiedTrust);
+	.print("Witness Sum: ", WitnessSumOfList);
+	AvgList = ((SumOfList / LengthOfList) / 3) + (CertifiedTrust / 3) + ((WitnessSumOfList / WitnessLengthOfList) / 3);
+	+trust_level(AvgList, Agent0);
 	.delete(Agent0, Agents, NewAgents);
 	!iterate(NewAgents).
 
@@ -115,10 +123,9 @@ robot_td("https://raw.githubusercontent.com/Interactions-HSG/example-tds/main/td
 
 +?add_up([Head | Tail], Agg, Sum): true <-
 	NewAgg = Head + Agg;
-	?add_up(Tail, NewAgg, NewAgg).
+	?add_up(Tail, NewAgg, Sum).
 
-+?add_up([], Agg, Sum) : true <-
-	.print("Result of Aggregation: ", Sum).
++?add_up([], Sum, Sum).
 
 
 
